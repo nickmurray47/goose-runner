@@ -18,51 +18,41 @@ parameters:
     requirement: required
     default: "./recipes/overnight.yaml"
     description: "Output path for the generated recipe"
-  - key: project_root
-    input_type: string
-    requirement: optional
-    default: "."
-    description: "Root dir to give the Filesystem MCP access to"
 
 extensions:
   - type: builtin
     name: developer
     bundled: true
-  - type: stdio
-    name: filesystem
-    cmd: npx
-    args:
-      - -y
-      - "@modelcontextprotocol/server-filesystem"
-      - "{{ project_root | default('.') }}"
-    timeout: 300
-    description: "File access for reading todos & writing the recipe"
 
-response:
-  json_schema:
-    type: object
-    required: [saved, path]
-    properties:
-      saved: { type: boolean, description: "Did we save the recipe file successfully?" }
-      path:  { type: string,  description: "Absolute or relative path to the saved recipe" }
+# COMMENTED OUT IF MODEL PROVIDER IS CLAUDE CODE
+# response:
+#   json_schema:
+#     type: object
+#     required: [saved, path]
+#     properties:
+#       saved: { type: boolean, description: "Did we save the recipe file successfully?" }
+#       path:  { type: string,  description: "Absolute or relative path to the saved recipe" }
 
 activities:
   - "Generate and save tonight's recipe from {{ todo_file }}"
 
 prompt: |
-  Read the todo file at {{ todo_file }} using the filesystem MCP server's read_file tool.
+  You have full bash access via the developer extension. Use it for all file operations.
 
-  Generate a complete Goose recipe YAML that executes the tasks listed. The recipe should:
-  - Include necessary extensions for the tasks (developer, filesystem, etc.)
-  - Use explicit commands where possible
-  - Be idempotent and safe to run
-  - Include either `instructions` or `prompt` (or both)
+  1. Read {{ todo_file }} using: cat {{ todo_file }}
 
-  Write the generated YAML to {{ output_recipe }} using ONLY bash commands via the developer extension.
-  Use: cat > {{ output_recipe }} << 'EOF'
-  [yaml content here]
-  EOF
+  2. Generate a complete Goose recipe YAML that executes those tasks. Include:
+     - required fields: version, title, description
+     - if using parameters, include them in the parameters section with the required fields: key, input_type, requirement, description
+     - necessary extensions (developer, filesystem, timeout, available_tools, etc.)
+     - explicit commands where possible
+     - either `instructions` or `prompt` field (required by Goose)
 
-  After writing, verify the file exists with: ls -la {{ output_recipe }}
+  3. Write the YAML to {{ output_recipe }} using bash heredoc:
+     cat > {{ output_recipe }} << 'EOF'
+     [your generated yaml here]
+     EOF
 
-  Return JSON: {saved: true, path: "{{ output_recipe }}"}
+  4. Verify: ls -la {{ output_recipe }}
+
+  5. Return JSON: {"saved": true, "path": "{{ output_recipe }}"}

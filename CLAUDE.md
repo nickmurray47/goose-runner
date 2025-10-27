@@ -81,3 +81,34 @@ Todo files should be named `todo_DD_MM_YY.README` and contain numbered task list
 - When tasks require specific tools, add them to the recipe's `extensions` section
 - Generated recipes should prefer explicit commands over vague instructions
 - File paths in generated recipes should be project-relative
+
+## Claude Code Provider on macOS
+
+When using the Claude Code provider (`GOOSE_PROVIDER=claude-code`), there are important permission considerations for macOS:
+
+### File Write Permissions
+
+The Claude Code provider delegates file operations to the `claude` CLI tool, which has its own permission system. To enable file write operations:
+
+**Set Goose Mode to "auto":**
+```bash
+# Via config file
+echo "GOOSE_MODE: auto" >> ~/.config/goose/config.yaml
+
+# Or via environment variable
+export GOOSE_MODE=auto
+
+# Or via goose configure command
+goose configure
+# Select: Goose Settings → Goose Mode → Auto Mode
+```
+
+Without `GOOSE_MODE=auto`, the claude CLI runs in restrictive mode and will require manual approval for all file writes, causing permission errors on macOS.
+
+### Structured Output Limitation
+
+**Important:** Recipes with `response` fields (structured JSON output) are **not compatible** with the Claude Code provider because:
+- Claude Code filters out Goose's tool ecosystem (including the `final_output` tool)
+- This causes the agent to never call the required tool, resulting in repeated "You MUST call the `final_output` tool NOW" messages
+
+**Solution:** Remove the `response` section from recipes when using Claude Code, or switch to the direct Anthropic provider (`GOOSE_PROVIDER=anthropic`) if structured output is required.
