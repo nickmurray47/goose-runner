@@ -1,0 +1,45 @@
+version: "1.0.0"
+title: "Daily Todo → Recipe Generator"
+description: "Turn today's todo README into a concrete Goose recipe that will run overnight."
+instructions: |
+  You will read the todo file at {{ todo_file }} and synthesize a Goose recipe that carries out the tasks
+  safely and idempotently. Prefer explicit commands over vague instructions. If a task needs tools,
+  include them in the recipe's `extensions`. If a task produces files, write into project-relative paths.
+  The generated YAML must include at least one of `instructions` or `prompt`.
+  Finally, WRITE the YAML to {{ output_recipe }} (overwriting if it exists), then confirm success via structured output.
+
+parameters:
+  - key: todo_file
+    input_type: string
+    requirement: required
+    description: "Path to today's todo README (e.g., ./todos/todo_26_10_25.README)"
+  - key: output_recipe
+    input_type: string
+    requirement: required
+    default: "./recipes/overnight.yaml"
+    description: "Output path for the generated recipe"
+
+extensions:
+  - type: builtin
+    name: developer
+    bundled: true
+  - type: stdio
+    name: filesystem
+    cmd: npx
+    args:
+      - -y
+      - "@modelcontextprotocol/server-filesystem"
+      - "{{ project_root | default('.') }}"
+    timeout: 300
+    description: "File access for reading todos & writing the recipe"
+
+response:
+  json_schema:
+    type: object
+    required: [saved, path]
+    properties:
+      saved: { type: boolean, description: "Did we save the recipe file successfully?" }
+      path:  { type: string,  description: "Absolute or relative path to the saved recipe" }
+
+activities:
+  - "Generate and save tonight's recipe from {{ todo_file }}"

@@ -1,0 +1,18 @@
+version: "1.0.0"
+title: "Overnight Runner"
+description: "At midnight, load and execute the latest generated overnight recipe."
+instructions: |
+  Use the subrecipe tool named `overnight` to execute tonight's work exactly once.
+  If the subrecipe is missing, exit with an actionable error that tells the user to (re)generate it.
+
+sub_recipes:
+  - name: "overnight"
+    path: "../recipes/overnight.yaml"   # <- constant path to the file you overwrite daily
+
+extensions:
+  - type: builtin
+    name: developer
+    bundled: true
+
+prompt: |
+  Run the `overnight` subrecipe now. Do not do anything else.
