@@ -18,6 +18,11 @@ parameters:
     requirement: required
     default: "./recipes/overnight.yaml"
     description: "Output path for the generated recipe"
+  - key: project_root
+    input_type: string
+    requirement: optional
+    default: "."
+    description: "Root dir to give the Filesystem MCP access to"
 
 extensions:
   - type: builtin
@@ -43,3 +48,21 @@ response:
 
 activities:
   - "Generate and save tonight's recipe from {{ todo_file }}"
+
+prompt: |
+  Read the todo file at {{ todo_file }} using the filesystem MCP server's read_file tool.
+
+  Generate a complete Goose recipe YAML that executes the tasks listed. The recipe should:
+  - Include necessary extensions for the tasks (developer, filesystem, etc.)
+  - Use explicit commands where possible
+  - Be idempotent and safe to run
+  - Include either `instructions` or `prompt` (or both)
+
+  Write the generated YAML to {{ output_recipe }} using ONLY bash commands via the developer extension.
+  Use: cat > {{ output_recipe }} << 'EOF'
+  [yaml content here]
+  EOF
+
+  After writing, verify the file exists with: ls -la {{ output_recipe }}
+
+  Return JSON: {saved: true, path: "{{ output_recipe }}"}
