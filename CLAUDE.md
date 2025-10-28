@@ -28,13 +28,14 @@ The system follows this workflow:
 All recipes follow Goose YAML format with these key sections:
 - `version`: Recipe format version (currently "1.0.0")
 - `title` & `description`: Metadata
-- `instructions`: Natural language instructions for the Goose agent
+- `prompt`: Natural language prompt for the Goose agent (**REQUIRED** - always use this)
 - `parameters`: Input parameters with validation
 - `extensions`: Tools/MCP servers available to the recipe (e.g., developer, filesystem)
 - `sub_recipes`: References to other recipes
 - `response`: Expected structured output (JSON schema)
 - `activities`: High-level task descriptions
-- `prompt`: Direct prompt to the agent
+
+**CRITICAL:** Always use `prompt` field. Never use `instructions` field - it will silently fail in this system.
 
 ### Key Recipes
 

@@ -1,63 +1,28 @@
 version: "1.0.0"
-title: "Overnight Task Automation - Project Directory Setup"
-description: "Automated execution of daily todo tasks: Create test_project directory structure with hello_world text file"
-
-instructions: |
-  You are tasked with executing the following todo items safely and idempotently:
-
-  1. Create a directory structure in ~/Projects/test_project
-  2. Create a .txt file containing "hello_world" in that directory
-
-  Execute these tasks using explicit bash commands. Follow these guidelines:
-  - Use absolute paths where possible to avoid ambiguity
-  - Use `mkdir -p` to create directories safely (won't fail if they already exist)
-  - Verify each step before proceeding to the next
-  - Provide clear feedback on success/failure of each operation
-
-  Specific commands to execute:
-  1. Create the ~/Projects directory if it doesn't exist: `mkdir -p ~/Projects`
-  2. Create the test_project subdirectory: `mkdir -p ~/Projects/test_project`
-  3. Create a .txt file with hello_world content: `echo "hello_world" > ~/Projects/test_project/hello_world.txt`
-  4. Verify the file was created: `ls -la ~/Projects/test_project/`
-  5. Verify the content: `cat ~/Projects/test_project/hello_world.txt`
-
-  Return structured output indicating success/failure of the task completion.
-
-parameters:
-  - key: "base_path"
-    description: "Base path for project creation"
-    type: "string"
-    default: "~/Projects"
-    required: false
+title: "Overnight Tasks - October 27, 2025"
+description: "Automated execution of daily todo tasks from todo_27_10_25.README"
 
 extensions:
-  - name: "developer"
-    description: "Provides bash command execution capabilities for file and directory operations"
+  - type: builtin
+    name: developer
+    bundled: true
+    description: "Provides bash shell access for file operations and system commands"
+
+prompt: |
+  Execute the following task safely and idempotently:
+
+  1. In the ~/Projects folder, create a new directory called test_project with a single .txt file that says hello_world
+
+  Use explicit bash commands to implement this task:
+  1. Create the ~/Projects directory if it doesn't exist: `mkdir -p ~/Projects`
+  2. Create the test_project subdirectory: `mkdir -p ~/Projects/test_project`
+  3. Create a .txt file with "hello_world" content: `echo "hello_world" > ~/Projects/test_project/hello_world.txt`
+  4. Verify the directory structure: `ls -la ~/Projects/test_project/`
+  5. Verify the file content: `cat ~/Projects/test_project/hello_world.txt`
+
+  Ensure all operations are idempotent and provide clear feedback on completion status.
 
 activities:
-  - title: "Create Project Directory Structure"
-    description: "Set up ~/Projects/test_project directory structure safely"
-  - title: "Create Hello World Text File"
-    description: "Generate hello_world.txt file with specified content"
-  - title: "Verify Task Completion"
-    description: "Confirm directory and file creation was successful"
-
-response:
-  type: "object"
-  properties:
-    success:
-      type: "boolean"
-      description: "Whether all tasks completed successfully"
-    created_directory:
-      type: "string"
-      description: "Path to the created directory"
-    created_file:
-      type: "string"
-      description: "Path to the created text file"
-    file_content:
-      type: "string"
-      description: "Content of the created file"
-    message:
-      type: "string"
-      description: "Summary of operations performed"
-  required: ["success", "message"]
+  - "Create ~/Projects/test_project directory structure"
+  - "Generate hello_world.txt file with specified content"
+  - "Verify successful completion of all tasks"

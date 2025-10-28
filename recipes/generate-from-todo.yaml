@@ -44,15 +44,20 @@ prompt: |
   2. Generate a complete Goose recipe YAML that executes those tasks. Include:
      - required fields: version, title, description
      - if using parameters, include them in the parameters section with the required fields: key, input_type, requirement, description
-     - necessary extensions (developer, filesystem, timeout, available_tools, etc.)
+     - necessary extensions with the full format. Valid extension types are: stdio, builtin, sse, platform, streamable_http, frontend, inline_python
+       * For MCP servers via npx, use type: stdio with cmd: npx and args: ["-y", "package-name"]
+       * For builtin tools, use type: builtin with name: developer (or other builtin) and bundled: true
+       * Extension fields: type (required), name, cmd, args, description, timeout (in seconds), env_keys (optional), bundled (optional), available_tools (array, default all)
      - explicit commands where possible
-     - either `instructions` or `prompt` field (required by Goose)
+     - CRITICAL: ALWAYS use the `prompt` field. NEVER use `instructions` - it will silently fail
+  
+  3. Verify the generated YAML is valid by running: goose validate {{ output_recipe }}. Correct any errors.
 
-  3. Write the YAML to {{ output_recipe }} using bash heredoc:
+  4. Write the YAML to {{ output_recipe }} using bash heredoc:
      cat > {{ output_recipe }} << 'EOF'
      [your generated yaml here]
      EOF
 
-  4. Verify: ls -la {{ output_recipe }}
-
-  5. Return JSON: {"saved": true, "path": "{{ output_recipe }}"}
+  5. Verify: ls -la {{ output_recipe }}
+  6. Save the recipe file by running: goose save {{ output_recipe }}
+  7. Return JSON: {"saved": true, "path": "{{ output_recipe }}"}
